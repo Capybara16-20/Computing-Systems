@@ -355,3 +355,10 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+#Cuda files
+.cu
+.cuh
+
+# OpenCL file
+.cl
