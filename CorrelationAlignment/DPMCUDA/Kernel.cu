@@ -2,7 +2,6 @@
 #include "cuda.h"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
-//#include "device_functions.h"
 
 __global__ void kernel(unsigned* src, int width, int height)
 {
@@ -30,7 +29,7 @@ int calc(unsigned* srcImage, int width, int height)
 	dim3 threads(128, 128);
 	dim3 blocks((width + threads.x - 1) / threads.x,
 		(height + threads.y - 1) / threads.y);
-	kernel <<<threads, blocks>>>(dev_srcImage, width, height);
+	kernel <<<threads, blocks>>> (dev_srcImage, width, height);
 	cudaError error = cudaMemcpy(srcImage, dev_srcImage, size,
 		cudaMemcpyDeviceToHost);
 	if (error != cudaError::cudaSuccess)

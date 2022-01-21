@@ -8,5 +8,3 @@ extern "C"
 {
 	void* _DECLARATOR_ __cdecl calculate(void* image);
 }
-
-#pragma once

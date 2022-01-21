@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.32002.261
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DeformablePolyhedronMethod", "DeformablePolyhedronMethod\DeformablePolyhedronMethod.vcxproj", "{55C2B8B4-3D3D-4272-ADB4-274674ED872E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DPMCUDA", "DPMCUDA\DPMCUDA.vcxproj", "{6A3A2557-9B56-4855-B3F0-840B43C54582}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DPMCUDA", "DPMCUDA\DPMCUDA.vcxproj", "{61B89471-2A1E-4309-81EC-A56418457068}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,14 +23,14 @@ Global
 		{55C2B8B4-3D3D-4272-ADB4-274674ED872E}.Release|x64.Build.0 = Release|x64
 		{55C2B8B4-3D3D-4272-ADB4-274674ED872E}.Release|x86.ActiveCfg = Release|Win32
 		{55C2B8B4-3D3D-4272-ADB4-274674ED872E}.Release|x86.Build.0 = Release|Win32
-		{6A3A2557-9B56-4855-B3F0-840B43C54582}.Debug|x64.ActiveCfg = Debug|x64
-		{6A3A2557-9B56-4855-B3F0-840B43C54582}.Debug|x64.Build.0 = Debug|x64
-		{6A3A2557-9B56-4855-B3F0-840B43C54582}.Debug|x86.ActiveCfg = Debug|Win32
-		{6A3A2557-9B56-4855-B3F0-840B43C54582}.Debug|x86.Build.0 = Debug|Win32
-		{6A3A2557-9B56-4855-B3F0-840B43C54582}.Release|x64.ActiveCfg = Release|x64
-		{6A3A2557-9B56-4855-B3F0-840B43C54582}.Release|x64.Build.0 = Release|x64
-		{6A3A2557-9B56-4855-B3F0-840B43C54582}.Release|x86.ActiveCfg = Release|Win32
-		{6A3A2557-9B56-4855-B3F0-840B43C54582}.Release|x86.Build.0 = Release|Win32
+		{61B89471-2A1E-4309-81EC-A56418457068}.Debug|x64.ActiveCfg = Debug|x64
+		{61B89471-2A1E-4309-81EC-A56418457068}.Debug|x64.Build.0 = Debug|x64
+		{61B89471-2A1E-4309-81EC-A56418457068}.Debug|x86.ActiveCfg = Debug|Win32
+		{61B89471-2A1E-4309-81EC-A56418457068}.Debug|x86.Build.0 = Debug|Win32
+		{61B89471-2A1E-4309-81EC-A56418457068}.Release|x64.ActiveCfg = Release|x64
+		{61B89471-2A1E-4309-81EC-A56418457068}.Release|x64.Build.0 = Release|x64
+		{61B89471-2A1E-4309-81EC-A56418457068}.Release|x86.ActiveCfg = Release|Win32
+		{61B89471-2A1E-4309-81EC-A56418457068}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

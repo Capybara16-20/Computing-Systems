@@ -1,5 +1,4 @@
-﻿#include<CL/cl.h>
-#pragma once
+﻿#pragma once
 
 namespace DeformablePolyhedronMethod {
 
@@ -15,6 +14,39 @@ namespace DeformablePolyhedronMethod {
 		int width;
 		int height;
 		unsigned* image;
+	};
+
+	public struct point
+	{
+		int x;
+		int y;
+
+		point()
+		{
+			x = y = 0;
+		}
+
+		point(int _x, int _y) : x(_x), y(_y){}
+
+		point operator+(point& other)
+		{
+			return point(x + other.x, y + other.y);
+		}
+
+		point operator-(point& other)
+		{
+			return point(x - other.x, y - other.y);
+		}
+
+		point operator*(double value)
+		{
+			return point(x * value, y * value);
+		}
+
+		point operator/(double value)
+		{
+			return point(x / value, y / value);
+		}
 	};
 
 	public ref class MainForm : public System::Windows::Forms::Form
@@ -73,6 +105,12 @@ namespace DeformablePolyhedronMethod {
 	private: System::Windows::Forms::Label^ lReflection;
 	private: System::Windows::Forms::TextBox^ tbAccuracy;
 	private: System::Windows::Forms::Label^ lAccuracy;
+	private: System::Windows::Forms::Panel^ pMethod;
+	private: System::Windows::Forms::RadioButton^ rbSimple;
+	private: System::Windows::Forms::RadioButton^ rbOpenMP;
+	private: System::Windows::Forms::RadioButton^ rbCuda;
+	private: System::Windows::Forms::TextBox^ tbIterations;
+	private: System::Windows::Forms::Label^ lbIterations;
 	private: System::ComponentModel::Container^ components;
 
 #pragma region Windows Form Designer generated code
@@ -101,6 +139,10 @@ namespace DeformablePolyhedronMethod {
 			this->tbResult = (gcnew System::Windows::Forms::TextBox());
 			this->lResult = (gcnew System::Windows::Forms::Label());
 			this->pInput = (gcnew System::Windows::Forms::Panel());
+			this->pMethod = (gcnew System::Windows::Forms::Panel());
+			this->rbSimple = (gcnew System::Windows::Forms::RadioButton());
+			this->rbOpenMP = (gcnew System::Windows::Forms::RadioButton());
+			this->rbCuda = (gcnew System::Windows::Forms::RadioButton());
 			this->lAccuracy = (gcnew System::Windows::Forms::Label());
 			this->tbAccuracy = (gcnew System::Windows::Forms::TextBox());
 			this->lStretch = (gcnew System::Windows::Forms::Label());
@@ -112,6 +154,8 @@ namespace DeformablePolyhedronMethod {
 			this->pMainImage = (gcnew System::Windows::Forms::Panel());
 			this->pbMain = (gcnew System::Windows::Forms::PictureBox());
 			this->ofdImage = (gcnew System::Windows::Forms::OpenFileDialog());
+			this->lbIterations = (gcnew System::Windows::Forms::Label());
+			this->tbIterations = (gcnew System::Windows::Forms::TextBox());
 			this->menu->SuspendLayout();
 			this->tlpImages->SuspendLayout();
 			this->tableLayoutPanel1->SuspendLayout();
@@ -119,6 +163,7 @@ namespace DeformablePolyhedronMethod {
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pbSub))->BeginInit();
 			this->pOutput->SuspendLayout();
 			this->pInput->SuspendLayout();
+			this->pMethod->SuspendLayout();
 			this->pMainImage->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pbMain))->BeginInit();
 			this->SuspendLayout();
@@ -273,9 +318,9 @@ namespace DeformablePolyhedronMethod {
 			this->tableLayoutPanel1->Location = System::Drawing::Point(3, 3);
 			this->tableLayoutPanel1->Name = L"tableLayoutPanel1";
 			this->tableLayoutPanel1->RowCount = 3;
-			this->tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 55)));
+			this->tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 68)));
 			this->tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 200)));
-			this->tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 45)));
+			this->tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 32)));
 			this->tableLayoutPanel1->Size = System::Drawing::Size(200, 431);
 			this->tableLayoutPanel1->TabIndex = 2;
 			// 
@@ -284,7 +329,7 @@ namespace DeformablePolyhedronMethod {
 			this->pSubImage->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
 			this->pSubImage->Controls->Add(this->pbSub);
 			this->pSubImage->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->pSubImage->Location = System::Drawing::Point(3, 130);
+			this->pSubImage->Location = System::Drawing::Point(3, 160);
 			this->pSubImage->Name = L"pSubImage";
 			this->pSubImage->Size = System::Drawing::Size(194, 194);
 			this->pSubImage->TabIndex = 0;
@@ -305,20 +350,21 @@ namespace DeformablePolyhedronMethod {
 			this->pOutput->Controls->Add(this->tbResult);
 			this->pOutput->Controls->Add(this->lResult);
 			this->pOutput->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->pOutput->Location = System::Drawing::Point(3, 330);
+			this->pOutput->Location = System::Drawing::Point(3, 360);
 			this->pOutput->Name = L"pOutput";
-			this->pOutput->Size = System::Drawing::Size(194, 98);
+			this->pOutput->Size = System::Drawing::Size(194, 68);
 			this->pOutput->TabIndex = 1;
 			// 
 			// tbResult
 			// 
 			this->tbResult->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
 			this->tbResult->Enabled = false;
-			this->tbResult->Font = (gcnew System::Drawing::Font(L"Calibri", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			this->tbResult->Font = (gcnew System::Drawing::Font(L"Calibri", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
 			this->tbResult->Location = System::Drawing::Point(9, 27);
+			this->tbResult->Multiline = true;
 			this->tbResult->Name = L"tbResult";
-			this->tbResult->Size = System::Drawing::Size(174, 27);
+			this->tbResult->Size = System::Drawing::Size(174, 37);
 			this->tbResult->TabIndex = 1;
 			// 
 			// lResult
@@ -335,6 +381,9 @@ namespace DeformablePolyhedronMethod {
 			// pInput
 			// 
 			this->pInput->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
+			this->pInput->Controls->Add(this->tbIterations);
+			this->pInput->Controls->Add(this->lbIterations);
+			this->pInput->Controls->Add(this->pMethod);
 			this->pInput->Controls->Add(this->lAccuracy);
 			this->pInput->Controls->Add(this->tbAccuracy);
 			this->pInput->Controls->Add(this->lStretch);
@@ -346,91 +395,133 @@ namespace DeformablePolyhedronMethod {
 			this->pInput->Dock = System::Windows::Forms::DockStyle::Fill;
 			this->pInput->Location = System::Drawing::Point(3, 3);
 			this->pInput->Name = L"pInput";
-			this->pInput->Size = System::Drawing::Size(194, 121);
+			this->pInput->Size = System::Drawing::Size(194, 151);
 			this->pInput->TabIndex = 2;
+			// 
+			// pMethod
+			// 
+			this->pMethod->Controls->Add(this->rbSimple);
+			this->pMethod->Controls->Add(this->rbOpenMP);
+			this->pMethod->Controls->Add(this->rbCuda);
+			this->pMethod->Location = System::Drawing::Point(3, 102);
+			this->pMethod->Name = L"pMethod";
+			this->pMethod->Size = System::Drawing::Size(185, 23);
+			this->pMethod->TabIndex = 8;
+			// 
+			// rbSimple
+			// 
+			this->rbSimple->AutoSize = true;
+			this->rbSimple->Location = System::Drawing::Point(128, 5);
+			this->rbSimple->Name = L"rbSimple";
+			this->rbSimple->Size = System::Drawing::Size(57, 17);
+			this->rbSimple->TabIndex = 2;
+			this->rbSimple->Text = L"Simple";
+			this->rbSimple->UseVisualStyleBackColor = true;
+			// 
+			// rbOpenMP
+			// 
+			this->rbOpenMP->AutoSize = true;
+			this->rbOpenMP->Location = System::Drawing::Point(60, 5);
+			this->rbOpenMP->Name = L"rbOpenMP";
+			this->rbOpenMP->Size = System::Drawing::Size(65, 17);
+			this->rbOpenMP->TabIndex = 1;
+			this->rbOpenMP->Text = L"OpenMP";
+			this->rbOpenMP->UseVisualStyleBackColor = true;
+			// 
+			// rbCuda
+			// 
+			this->rbCuda->AutoSize = true;
+			this->rbCuda->Checked = true;
+			this->rbCuda->Location = System::Drawing::Point(5, 5);
+			this->rbCuda->Name = L"rbCuda";
+			this->rbCuda->Size = System::Drawing::Size(51, 17);
+			this->rbCuda->TabIndex = 0;
+			this->rbCuda->TabStop = true;
+			this->rbCuda->Text = L"CUDA";
+			this->rbCuda->UseVisualStyleBackColor = true;
 			// 
 			// lAccuracy
 			// 
 			this->lAccuracy->AutoSize = true;
 			this->lAccuracy->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
-			this->lAccuracy->Font = (gcnew System::Drawing::Font(L"Calibri", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			this->lAccuracy->Font = (gcnew System::Drawing::Font(L"Calibri", 11.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->lAccuracy->Location = System::Drawing::Point(5, 86);
+			this->lAccuracy->Location = System::Drawing::Point(3, 80);
 			this->lAccuracy->Name = L"lAccuracy";
-			this->lAccuracy->Size = System::Drawing::Size(90, 21);
+			this->lAccuracy->Size = System::Drawing::Size(84, 20);
 			this->lAccuracy->TabIndex = 7;
 			this->lAccuracy->Text = L"Accuracy (ε)";
 			// 
 			// tbAccuracy
 			// 
-			this->tbAccuracy->Font = (gcnew System::Drawing::Font(L"Calibri", 9.75F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			this->tbAccuracy->Font = (gcnew System::Drawing::Font(L"Calibri", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->tbAccuracy->Location = System::Drawing::Point(138, 86);
+			this->tbAccuracy->Location = System::Drawing::Point(144, 80);
 			this->tbAccuracy->Name = L"tbAccuracy";
-			this->tbAccuracy->Size = System::Drawing::Size(45, 23);
+			this->tbAccuracy->Size = System::Drawing::Size(45, 22);
 			this->tbAccuracy->TabIndex = 6;
 			this->tbAccuracy->Text = L"0.001";
 			// 
 			// lStretch
 			// 
 			this->lStretch->AutoSize = true;
-			this->lStretch->Font = (gcnew System::Drawing::Font(L"Calibri", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			this->lStretch->Font = (gcnew System::Drawing::Font(L"Calibri", 11.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->lStretch->Location = System::Drawing::Point(5, 57);
+			this->lStretch->Location = System::Drawing::Point(5, 55);
 			this->lStretch->Name = L"lStretch";
-			this->lStretch->Size = System::Drawing::Size(75, 19);
+			this->lStretch->Size = System::Drawing::Size(72, 18);
 			this->lStretch->TabIndex = 5;
 			this->lStretch->Text = L"Stretch (γ)";
 			// 
 			// lCompression
 			// 
 			this->lCompression->AutoSize = true;
-			this->lCompression->Font = (gcnew System::Drawing::Font(L"Calibri", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			this->lCompression->Font = (gcnew System::Drawing::Font(L"Calibri", 11.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
 			this->lCompression->Location = System::Drawing::Point(5, 30);
 			this->lCompression->Name = L"lCompression";
-			this->lCompression->Size = System::Drawing::Size(116, 19);
+			this->lCompression->Size = System::Drawing::Size(110, 18);
 			this->lCompression->TabIndex = 4;
 			this->lCompression->Text = L"Compression (β)";
 			// 
 			// tbStretch
 			// 
-			this->tbStretch->Font = (gcnew System::Drawing::Font(L"Calibri", 9.75F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			this->tbStretch->Font = (gcnew System::Drawing::Font(L"Calibri", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->tbStretch->Location = System::Drawing::Point(138, 59);
+			this->tbStretch->Location = System::Drawing::Point(144, 55);
 			this->tbStretch->Name = L"tbStretch";
-			this->tbStretch->Size = System::Drawing::Size(45, 23);
+			this->tbStretch->Size = System::Drawing::Size(45, 22);
 			this->tbStretch->TabIndex = 3;
 			this->tbStretch->Text = L"2";
 			// 
 			// tbCompression
 			// 
-			this->tbCompression->Font = (gcnew System::Drawing::Font(L"Calibri", 9.75F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			this->tbCompression->Font = (gcnew System::Drawing::Font(L"Calibri", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->tbCompression->Location = System::Drawing::Point(138, 32);
+			this->tbCompression->Location = System::Drawing::Point(144, 30);
 			this->tbCompression->Name = L"tbCompression";
-			this->tbCompression->Size = System::Drawing::Size(45, 23);
+			this->tbCompression->Size = System::Drawing::Size(45, 22);
 			this->tbCompression->TabIndex = 2;
 			this->tbCompression->Text = L"0.5";
 			// 
 			// tbReflection
 			// 
-			this->tbReflection->Font = (gcnew System::Drawing::Font(L"Calibri", 9.75F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			this->tbReflection->Font = (gcnew System::Drawing::Font(L"Calibri", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->tbReflection->Location = System::Drawing::Point(138, 5);
+			this->tbReflection->Location = System::Drawing::Point(144, 5);
 			this->tbReflection->Name = L"tbReflection";
-			this->tbReflection->Size = System::Drawing::Size(45, 23);
+			this->tbReflection->Size = System::Drawing::Size(45, 22);
 			this->tbReflection->TabIndex = 1;
 			this->tbReflection->Text = L"1";
 			// 
 			// lReflection
 			// 
 			this->lReflection->AutoSize = true;
-			this->lReflection->Font = (gcnew System::Drawing::Font(L"Calibri", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			this->lReflection->Font = (gcnew System::Drawing::Font(L"Calibri", 11.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
 			this->lReflection->Location = System::Drawing::Point(5, 5);
 			this->lReflection->Name = L"lReflection";
-			this->lReflection->Size = System::Drawing::Size(97, 19);
+			this->lReflection->Size = System::Drawing::Size(92, 18);
 			this->lReflection->TabIndex = 1;
 			this->lReflection->Text = L"Reflection (α)";
 			// 
@@ -457,6 +548,27 @@ namespace DeformablePolyhedronMethod {
 			// ofdImage
 			// 
 			this->ofdImage->FileName = L"openFileDialog1";
+			// 
+			// lbIterations
+			// 
+			this->lbIterations->AutoSize = true;
+			this->lbIterations->Font = (gcnew System::Drawing::Font(L"Calibri", 11.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(204)));
+			this->lbIterations->Location = System::Drawing::Point(5, 125);
+			this->lbIterations->Name = L"lbIterations";
+			this->lbIterations->Size = System::Drawing::Size(67, 18);
+			this->lbIterations->TabIndex = 9;
+			this->lbIterations->Text = L"Iterations";
+			// 
+			// tbIterations
+			// 
+			this->tbIterations->Font = (gcnew System::Drawing::Font(L"Calibri", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(204)));
+			this->tbIterations->Location = System::Drawing::Point(144, 125);
+			this->tbIterations->Name = L"tbIterations";
+			this->tbIterations->Size = System::Drawing::Size(45, 22);
+			this->tbIterations->TabIndex = 10;
+			this->tbIterations->Text = L"100";
 			// 
 			// MainForm
 			// 
@@ -487,6 +599,8 @@ namespace DeformablePolyhedronMethod {
 			this->pOutput->PerformLayout();
 			this->pInput->ResumeLayout(false);
 			this->pInput->PerformLayout();
+			this->pMethod->ResumeLayout(false);
+			this->pMethod->PerformLayout();
 			this->pMainImage->ResumeLayout(false);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pbMain))->EndInit();
 			this->ResumeLayout(false);
@@ -495,32 +609,63 @@ namespace DeformablePolyhedronMethod {
 		}
 #pragma endregion
 	private: 
-		System::Void menuLightTheme_Click(System::Object^ sender, System::EventArgs^ e);
+		struct img* MainImage = new img();
+		struct img* SubImage = new img();
 
+		System::Void menuLightTheme_Click(System::Object^ sender, System::EventArgs^ e);
 		System::Void menuDarkTheme_Click(System::Object^ sender, System::EventArgs^ e);
-		
 		System::Void menuBlueTheme_Click(System::Object^ sender, System::EventArgs^ e);
-		
 		System::Void menuLCoralTheme_Click(System::Object^ sender, System::EventArgs^ e);
-		
 		System::Void menuGreenTheme_Click(System::Object^ sender, System::EventArgs^ e);
 		
 		System::Void menuOpenMain_Click(System::Object^ sender, System::EventArgs^ e);
-		
 		System::Void menuOpenSub_Click(System::Object^ sender, System::EventArgs^ e);
-		
 		System::Void menuCalculate_Click(System::Object^ sender, System::EventArgs^ e);
-		
 		System::Void menuExit_Click(System::Object^ sender, System::EventArgs^ e);
 
 		void ChangeTheme(System::Drawing::Color color);
 
+		struct img* GetImageCopy(struct img* image);
+
 		void InitializeImage(struct img* image, PictureBox^ pbSource);
 
-		void Calculate();
+		void Calculate(struct img* mainImage, struct img* subImage, double reflection, 
+			double compression, double stretch, double accuracy, int iterations);
 
+		long double GetFunctionValue(struct point point, struct img* mainImage, struct img* subImage);
 
+		long double GetBrightness(unsigned pixel);
+
+		struct point GetRandomPoint(int maxX, int maxY);
+
+		struct img* GetGrayImage(struct img* image);
+
+		void CalculateCUDA(struct img* mainImage, struct img* subImage, double reflection, 
+			double compression, double stretch, double accuracy, int iterations);
+
+		void CalculateOpenMP(struct img* mainImage, struct img* subImage, double reflection, 
+			double compression, double stretch, double accuracy, int iterations);
+
+		void ShowImage(struct img* image, PictureBox^ pictureBox);
+
+		void ShowFoundImage(struct img* mainImage, struct img* subImage, struct point point);
 
 		void ShowResult(String^ message);
+
+		struct img* GetImageWithPoint(struct img* srcImage, struct point point);
+
+		void SortPoints(struct point* points, long double* functions, int pointsCount);
+
+		struct point GetGravityCenter(struct point* points, int pointsCount);
+
+		bool IsImageFound(long double* functions, int pointsCount, long double gravityCenter_f, double accuracy, long double& currentAccuracy);
+
+		struct point GetReflectedPoint(struct point gravityCenter_p, struct point worst_p, double reflection, int maxX, int maxY);
+
+		struct point GetStretchedPoint(struct point gravityCenter_p, struct point reflected_p, double stretch, int maxX, int maxY);
+
+		struct point GetCompressedPoint(struct point gravityCenter_p, struct point worst_p, double compression, int maxX, int maxY);
+
+		struct point* GetReducedPoints(struct point* points, struct point best_p, int pointsCount, int maxX, int maxY);
 	};
 }
