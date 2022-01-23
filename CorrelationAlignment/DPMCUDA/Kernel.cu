@@ -6,7 +6,7 @@
 #include <curand.h>
 #include <curand_kernel.h>
 
-const int maxThreads = 128;
+const int maxThreads = 256;
 const int maxCount = 1024;
 
 __global__ void getGrayImage_kernel(unsigned* src, int width, int height)
@@ -52,17 +52,22 @@ __global__ void getFunctionParameters(int x, int y, unsigned* main, int mainWidt
 	__shared__ long double temp_subMultipliers[maxThreads];
 	__shared__ long double temp_mainMultipliers[maxThreads];
 	int tid = threadIdx.x;
-	int i = blockIdx.x * blockDim.x + threadIdx.x;
+	int sub_index = blockIdx.x * blockDim.x + threadIdx.x;
+	int y_offset = sub_index / subWidth;
+	int x_offset = sub_index % subWidth;
+	//int main_i = blockIdx.x * (mainWidth + y) + threadIdx.x + x;
+	int main_i = mainWidth * (y + y_offset) + x + x_offset;
+	//mainWidth * (y + blockIdx.x) + threadIdx.x + x
 	long double temp_numerator = 0;
 	long double temp_subMultiplier = 0;
 	long double temp_mainMultiplier = 0;
-	while (i < subWidth * subHeight)
+	while (sub_index < subWidth * subHeight)
 	{
-		unsigned subPixel = sub[blockIdx.x * blockDim.x + threadIdx.x];
+		unsigned subPixel = sub[sub_index];
 		long double subBrightness = 0.299 * ((subPixel & 0x00ff0000) >> 16)
 			+ 0.587 * ((subPixel & 0x0000ff00) >> 8) + 0.114 * (subPixel & 0x000000ff);
 
-		unsigned mainPixel = main[(blockIdx.x + y) * blockDim.x + threadIdx.x + x];
+		unsigned mainPixel = main[main_i];
 		long double mainBrightness = 0.299 * ((mainPixel & 0x00ff0000) >> 16)
 			+ 0.587 * ((mainPixel & 0x0000ff00) >> 8) + 0.114 * (mainPixel & 0x000000ff);
 
@@ -70,7 +75,7 @@ __global__ void getFunctionParameters(int x, int y, unsigned* main, int mainWidt
 		temp_subMultiplier += subBrightness * subBrightness;
 		temp_mainMultiplier += mainBrightness * mainBrightness;
 
-		i += blockDim.x * gridDim.x;
+		sub_index += blockDim.x * gridDim.x;
 	}
 	temp_numerators[tid] = temp_numerator;
 	temp_subMultipliers[tid] = temp_subMultiplier;
@@ -146,7 +151,7 @@ int findImage(unsigned* mainImage, int mainWidth, int mainHeight,
 
 	int blockSize;
 	int gridSize;
-	if (iterations * pointsCount * coordsCount < maxThreads)
+	/*if (iterations * pointsCount * coordsCount < maxThreads)
 	{
 		blockSize = iterations * pointsCount * coordsCount;
 		gridSize = 1;
@@ -201,7 +206,16 @@ int findImage(unsigned* mainImage, int mainWidth, int mainHeight,
 	cudaFree(states);
 	cudaFree(dev_coords);
 	cudaFree(dev_xCoords);
-	cudaFree(dev_yCoords);
+	cudaFree(dev_yCoords);*/
+
+	int* xCoords = new int[iterations * pointsCount];
+	int* yCoords = new int[iterations * pointsCount];
+	for (int i = 0; i < iterations * pointsCount; i++)
+	{
+		xCoords[i] = rand() % maxX;
+		yCoords[i] = rand() % maxY;
+	}
+
 #pragma endregion
 
 	//Получение значений функции для всех точек
@@ -236,13 +250,8 @@ int findImage(unsigned* mainImage, int mainWidth, int mainHeight,
 	}
 #pragma endregion
 
-	//int temp_x = 150;
-	//int temp_y = 190;
-	//long double temp_f = GetFunctionValue(temp_x, temp_y, dev_mainImage, mainWidth,
-		//mainHeight, dev_subImage, subWidth, subHeight, blockSize, gridSize);
-	//long double temp_f = tempGetFunctionValue(temp_x, temp_y, mainImage, mainWidth, mainHeight, subImage, subWidth, subHeight);
-
 	//Проведение итераций для всех наборов точек
+#pragma region
 	long double found_f = 0;
 	int best_x, best_y, middle_x, middle_y, worst_x, worst_y;
 	long double best_f, middle_f, worst_f;
@@ -277,7 +286,6 @@ int findImage(unsigned* mainImage, int mainWidth, int mainHeight,
 			int gravityCenter_y = (best_y + middle_y) / (pointsCount - 1);
 			long double gravityCenter_f = GetFunctionValue(gravityCenter_x, gravityCenter_y, dev_mainImage, mainWidth,
 				mainHeight, dev_subImage, subWidth, subHeight, blockSize, gridSize);
-			//long double gravityCenter_f = tempGetFunctionValue(gravityCenter_x, gravityCenter_y, mainImage, mainWidth, mainHeight, subImage, subWidth, subHeight);
 
 			//Провера окончания
 			bool isImageFound = IsImageFound(funcs, pointsCount, gravityCenter_f, accuracy);
@@ -304,7 +312,6 @@ int findImage(unsigned* mainImage, int mainWidth, int mainHeight,
 
 			long double reflected_f = GetFunctionValue(reflected_x, reflected_y, dev_mainImage, mainWidth,
 				mainHeight, dev_subImage, subWidth, subHeight, blockSize, gridSize);
-			//long double reflected_f = tempGetFunctionValue(reflected_x, reflected_y, mainImage, mainWidth, mainHeight, subImage, subWidth, subHeight);
 
 			if (reflected_f >= best_f) //"Растяжение"
 			{
@@ -313,7 +320,6 @@ int findImage(unsigned* mainImage, int mainWidth, int mainHeight,
 
 				long double stretched_f = GetFunctionValue(stretched_x, stretched_y, dev_mainImage, mainWidth,
 					mainHeight, dev_subImage, subWidth, subHeight, blockSize, gridSize);
-				//long double stretched_f = tempGetFunctionValue(stretched_x, stretched_y, mainImage, mainWidth, mainHeight, subImage, subWidth, subHeight);
 
 				if (stretched_f > best_f)
 				{
@@ -335,7 +341,6 @@ int findImage(unsigned* mainImage, int mainWidth, int mainHeight,
 				
 				long double compressed_f = GetFunctionValue(compressed_x, compressed_y, dev_mainImage, mainWidth,
 					mainHeight, dev_subImage, subWidth, subHeight, blockSize, gridSize);
-				//long double compressed_f = tempGetFunctionValue(compressed_x, compressed_y, mainImage, mainWidth, mainHeight, subImage, subWidth, subHeight);
 
 				p_xCoords[worstIndex] = compressed_x;
 				p_yCoords[worstIndex] = compressed_y;
@@ -355,8 +360,6 @@ int findImage(unsigned* mainImage, int mainWidth, int mainHeight,
 				for (int i = 0; i < pointsCount; i++)
 					funcs[i] = GetFunctionValue(p_xCoords[i], p_yCoords[i], dev_mainImage, mainWidth,
 						mainHeight, dev_subImage, subWidth, subHeight, blockSize, gridSize);
-				//for (int i = 0; i < pointsCount; i++)
-					//funcs[i] = tempGetFunctionValue(p_xCoords[i], p_yCoords[i], mainImage, mainWidth, mainHeight, subImage, subWidth, subHeight);
 			}
 
 		}
@@ -364,6 +367,10 @@ int findImage(unsigned* mainImage, int mainWidth, int mainHeight,
 	cudaFree(dev_mainImage);
 	cudaFree(dev_subImage);
 
+	int a = found_x;
+	int b = found_y;
+	long double f = found_f;
+#pragma endregion
 	return 0;
 }
 
@@ -430,10 +437,6 @@ long double GetFunctionValue(int x, int y, unsigned* dev_mainImage, int mainWidt
 	}
 
 	long double function = numerator / (sqrt(subMultiplier * mainMultiplier));
-
-	cudaFree(dev_numerators);
-	cudaFree(dev_subMultipliers);
-	cudaFree(dev_mainMultipliers);
 	return function;
 }
 
@@ -500,47 +503,4 @@ int* GetReducedCoords(int* coords, int best, int pointsCount, int max)
 	}
 
 	return reducedCoords;
-}
-
-long double tempGetFunctionValue (int x, int y, unsigned* main, int mainWidth, int mainHeight,
-	unsigned* sub, int subWidth, int subHeight)
-{
-	long double numerator = 0;
-	for (int i = 0; i < subHeight; i++)
-	{
-		int check = 0;
-		for (int j = 0; j < subWidth; j++)
-		{
-			long double subBrightness = tempGetBrightness(sub[i * subWidth + j]);
-			long double mainBrightness = tempGetBrightness(main[mainWidth * (y + i) + x + j]);
-			numerator += subBrightness * mainBrightness;
-		}
-	}
-
-	long double denominator;
-	long double subMultiplier = 0;
-	long double mainMultiplier = 0;
-	for (int i = 0; i < subHeight; i++)
-	{
-		for (int j = 0; j < subWidth; j++)
-		{
-			long double subBrightness = tempGetBrightness(sub[i * subWidth + j]);
-			long double mainBrightness = tempGetBrightness(main[mainWidth * (y + i) + x + j]);
-			subMultiplier += pow(subBrightness, 2);
-			mainMultiplier += pow(mainBrightness, 2);
-		}
-	}
-	denominator = sqrt(subMultiplier * mainMultiplier);
-
-	return numerator / denominator;
-}
-
-long double tempGetBrightness(unsigned pixel)
-{
-	unsigned red = (pixel & 0x00ff0000) >> 16;
-	unsigned green = (pixel & 0x0000ff00) >> 8;
-	unsigned blue = (pixel & 0x000000ff);
-
-	long double brightness = 0.299 * red + 0.587 * green + 0.114 * blue;
-	return brightness;
 }
