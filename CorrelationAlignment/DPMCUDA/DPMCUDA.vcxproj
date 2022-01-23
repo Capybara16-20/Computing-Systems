@@ -95,11 +95,12 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>cudart.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cudart.lib;cudadevrt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>module.def</ModuleDefinitionFile>
     </Link>
     <CudaCompile>
       <CodeGeneration>compute_50,sm_50</CodeGeneration>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
