@@ -612,60 +612,47 @@ namespace DeformablePolyhedronMethod {
 		struct img* MainImage = new img();
 		struct img* SubImage = new img();
 
+
+		struct img* GetImageCopy(struct img* image);
+		void InitializeImage(struct img* image, PictureBox^ pbSource);
+
+		struct point Calculate(struct img* mainImage, struct img* subImage, double reflection,
+			double compression, double stretch, double accuracy, int iterations);
+		long double GetFunctionValue(struct point point, struct img* mainImage, struct img* subImage);
+		long double GetBrightness(unsigned pixel);
+		struct point GetRandomPoint(int maxX, int maxY);
+		struct img* GetGrayImage(struct img* image);
+		struct img* GetImageWithPoint(struct img* srcImage, struct point point);
+		void SortPoints(struct point* points, long double* functions, int pointsCount);
+		struct point GetGravityCenter(struct point* points, int pointsCount);
+		bool IsImageFound(long double* functions, int pointsCount, long double gravityCenter_f, double accuracy, long double& currentAccuracy);
+		struct point GetReflectedPoint(struct point gravityCenter_p, struct point worst_p, double reflection, int maxX, int maxY);
+		struct point GetStretchedPoint(struct point gravityCenter_p, struct point reflected_p, double stretch, int maxX, int maxY);
+		struct point GetCompressedPoint(struct point gravityCenter_p, struct point worst_p, double compression, int maxX, int maxY);
+		struct point* GetReducedPoints(struct point* points, struct point best_p, int pointsCount, int maxX, int maxY);
+
+		struct point CalculateCUDA(struct img* mainImage, struct img* subImage, double reflection,
+			double compression, double stretch, double accuracy, int iterations);
+
+		struct point CalculateOpenMP(struct img* mainImage, struct img* subImage, double reflection,
+			double compression, double stretch, double accuracy, int iterations);
+		struct img* GetGrayImage_OpenMP(struct img* image);
+		struct img* GetImageCopy_OpenMP(struct img* image);
+		long double GetFunctionValue_OpenMP (struct point point, struct img* mainImage, struct img* subImage);
+
+		void ShowImage(struct img* image, PictureBox^ pictureBox);
+		void ShowFoundImage(struct img* mainImage, struct img* subImage, struct point point);
+		void ShowResult(struct point found_p, double time);
+
+		void ChangeTheme(System::Drawing::Color color);
 		System::Void menuLightTheme_Click(System::Object^ sender, System::EventArgs^ e);
 		System::Void menuDarkTheme_Click(System::Object^ sender, System::EventArgs^ e);
 		System::Void menuBlueTheme_Click(System::Object^ sender, System::EventArgs^ e);
 		System::Void menuLCoralTheme_Click(System::Object^ sender, System::EventArgs^ e);
 		System::Void menuGreenTheme_Click(System::Object^ sender, System::EventArgs^ e);
-		
 		System::Void menuOpenMain_Click(System::Object^ sender, System::EventArgs^ e);
 		System::Void menuOpenSub_Click(System::Object^ sender, System::EventArgs^ e);
 		System::Void menuCalculate_Click(System::Object^ sender, System::EventArgs^ e);
 		System::Void menuExit_Click(System::Object^ sender, System::EventArgs^ e);
-
-		void ChangeTheme(System::Drawing::Color color);
-
-		struct img* GetImageCopy(struct img* image);
-
-		void InitializeImage(struct img* image, PictureBox^ pbSource);
-
-		void Calculate(struct img* mainImage, struct img* subImage, double reflection, 
-			double compression, double stretch, double accuracy, int iterations);
-
-		long double GetFunctionValue(struct point point, struct img* mainImage, struct img* subImage);
-
-		long double GetBrightness(unsigned pixel);
-
-		struct point GetRandomPoint(int maxX, int maxY);
-
-		struct img* GetGrayImage(struct img* image);
-
-		void CalculateCUDA(struct img* mainImage, struct img* subImage, double reflection, 
-			double compression, double stretch, double accuracy, int iterations);
-
-		void CalculateOpenMP(struct img* mainImage, struct img* subImage, double reflection, 
-			double compression, double stretch, double accuracy, int iterations);
-
-		void ShowImage(struct img* image, PictureBox^ pictureBox);
-
-		void ShowFoundImage(struct img* mainImage, struct img* subImage, struct point point);
-
-		void ShowResult(String^ message);
-
-		struct img* GetImageWithPoint(struct img* srcImage, struct point point);
-
-		void SortPoints(struct point* points, long double* functions, int pointsCount);
-
-		struct point GetGravityCenter(struct point* points, int pointsCount);
-
-		bool IsImageFound(long double* functions, int pointsCount, long double gravityCenter_f, double accuracy, long double& currentAccuracy);
-
-		struct point GetReflectedPoint(struct point gravityCenter_p, struct point worst_p, double reflection, int maxX, int maxY);
-
-		struct point GetStretchedPoint(struct point gravityCenter_p, struct point reflected_p, double stretch, int maxX, int maxY);
-
-		struct point GetCompressedPoint(struct point gravityCenter_p, struct point worst_p, double compression, int maxX, int maxY);
-
-		struct point* GetReducedPoints(struct point* points, struct point best_p, int pointsCount, int maxX, int maxY);
 	};
 }

@@ -6,8 +6,7 @@
 #include <curand.h>
 #include <curand_kernel.h>
 
-const int maxThreads = 256;
-const int maxCount = 1024;
+const int maxThreads = 512;
 
 __global__ void getGrayImage_kernel(unsigned* src, int width, int height)
 {
@@ -55,9 +54,7 @@ __global__ void getFunctionParameters(int x, int y, unsigned* main, int mainWidt
 	int sub_index = blockIdx.x * blockDim.x + threadIdx.x;
 	int y_offset = sub_index / subWidth;
 	int x_offset = sub_index % subWidth;
-	//int main_i = blockIdx.x * (mainWidth + y) + threadIdx.x + x;
 	int main_i = mainWidth * (y + y_offset) + x + x_offset;
-	//mainWidth * (y + blockIdx.x) + threadIdx.x + x
 	long double temp_numerator = 0;
 	long double temp_subMultiplier = 0;
 	long double temp_mainMultiplier = 0;
@@ -83,7 +80,6 @@ __global__ void getFunctionParameters(int x, int y, unsigned* main, int mainWidt
 	__syncthreads();
 	for (int s = 1; s < blockDim.x; s *= 2)
 	{
-		//проверuть, участвует лu нить на данном шаге
 		if (tid % (2 * s) == 0)
 		{
 			temp_numerators[tid] += temp_numerators[tid + s];
